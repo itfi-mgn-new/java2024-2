@@ -1,11 +1,12 @@
 package lesson7;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 public class ArrayTest {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IllegalArgumentException, IllegalAccessException {
 		// TODO Auto-generated method stub
 		int[][]	x = new int[][] {new int[] {1,2,3}};
 		Class	cl = x.getClass();
@@ -32,11 +33,23 @@ public class ArrayTest {
 		// a = {1,2,3,4,5}
 		System.err.println("REsult: "+Arrays.toString(a));
 		
-		System.err.println(calculate(new TestClass()));
+		System.err.println("Sum="+calculate(new TestClass()));
 	}
 
-	static int calculate(final Object obj) {
-		// TODO: find all integer fields inside obj and calculate it's sum
+	static int calculate(final Object obj) throws IllegalArgumentException, IllegalAccessException {
+		Class	current = obj.getClass();
+		int		sum = 0;
+		
+		while (current != null) {
+			for(Field f : current.getDeclaredFields()) {
+				if (f.getType() == int.class) {
+					f.setAccessible(true);
+					sum += f.getInt(obj);
+				}
+			}
+			current = current.getSuperclass();
+		}
+		return sum;
 	}
 	
 //	class TestClass {
